@@ -1,0 +1,12 @@
+[kintone]
+DOMAIN=sub-domain
+APP_ID=9999
+TOKEN=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+ACTION=Update
+UPDATE_KEY=更新用キーのフィールドコード
+
+;セクション名にアプリIDを設定する
+[9999]
+TOKEN=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+ACTION=Update
+UPDATE_KEY=更新用キーのフィールドコード
