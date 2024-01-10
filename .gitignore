@@ -161,3 +161,7 @@ cython_debug/
 
 
 kintone.ini
+import_sjis.csv
+main.py
+*.csv
+.vscode/launch.json
