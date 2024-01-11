@@ -58,14 +58,38 @@ def readAppConfig(filePath,appId):
   else:
     return {'type':'error','hasOptions':config.options(str(appId))}
 
+
 # iniファイルの設定項目が必要な項目のテンプレートを返す
 def getTemplateConfig():
   return {'domain': 'サブドメイン', 'appId': 'アプリ番号', 'token': 'トークン', 'action': 'Update/Insert/Delete', 'upkey': '更新用キー'}
 
+# 配列をN分割した配列を返す
+def getSplitedList(list, n):
+    for idx in range(0, len(list), n):
+        yield list[idx:idx + n]
+
+
+# kintoneのレコード更新用JSONを指定行ずつに区切って生成する
+def makeUpdateRecordsJsonList(kintoneConfigData,updateKeyValues,recordsKeyFields,recordsKeyValues,splitUnit=100):
+  if(len(updateKeyValues) == len(recordsKeyValues)
+    and kintoneConfigData.keys() == getTemplateConfig().keys()
+  ):
+
+    updateKeyValuesList = list(getSplitedList(updateKeyValues,splitUnit))
+    recordsKeyFieldsList = list(getSplitedList(recordsKeyFields,splitUnit))
+    recordsKeyValuesList = list(getSplitedList(recordsKeyValues,splitUnit))
+
+    jsonList = []
+    for updateValuesList,recordsValuesList in zip(updateKeyValuesList,recordsKeyValuesList):
+      tmp = getUpdateRecordsJson(kintoneConfigData,updateValuesList,recordsKeyFields,recordsValuesList)
+      jsonList.append(tmp)
+  else:
+    jsonList = {'type':'error','updateKeyValues':len(updateKeyValues),'recordsKeyValues':len(recordsKeyValues),'hasKintoneConfigKeys':kintoneConfigData.keys()}
+  return jsonList
+
 # kintoneのレコード更新用JSONを生成する
-def makeUpdateRecordsJson(kintoneConfigData,updateKeyValues,recordsKeyFields,recordsKeyValues):
+def getUpdateRecordsJson(kintoneConfigData,updateKeyValues,recordsKeyFields,recordsKeyValues):
   import json
-  templateConfig = {'domain': 'サブドメイン', 'appId': 'アプリ番号', 'token': 'トークン', 'action': 'Update/Insert/Delete', 'upkey': '更新用キー'}
 
   # 更新用キーの数と更新データの件数が一致
   # かつ iniファイルの設定項目が必要な項目だけあれば更新用のデータを作成する。
@@ -106,14 +130,14 @@ def makeUpdateRecordsJson(kintoneConfigData,updateKeyValues,recordsKeyFields,rec
     jsonStr = ''.join(jsonStrList)
 
     # 文字列からJSONを作成
-    jsonData = json.loads(jsonStr)
+    jsonList = json.loads(jsonStr)
 
-    return jsonData
+    return jsonList
   else:
     return {'type':'error','updateKeyValues':len(updateKeyValues),'recordsKeyValues':len(recordsKeyValues),'hasKintoneConfigKeys':kintoneConfigData.keys()}
 
 
-def updateRecords(kintoneConfigData,recordsData):
+def updateRecords(kintoneConfigData,jsonList):
   import requests
   import json
   import unicodedata
@@ -137,17 +161,17 @@ def updateRecords(kintoneConfigData,recordsData):
       'Content-Type': 'application/json',
       }
 
-    # 流し込みデータ作成
-    data = recordsData
+    ret = []
+    for jsonData in jsonList:
+      # GETで参照、POSTで追加、PUTで更新
+      response = requests.put(url+'?app='+str(appId), json=jsonData, headers=headers, timeout=60)
 
-    # GETで参照、POSTで追加、PUTで更新
-    response = requests.put(url+'?app='+str(appId), json=data, headers=headers, timeout=60)
-
-    # レスポンスがJSON形式で返却されるので、JSONをパースする
-    if(response.ok == False):
-      return response
-    return json.dumps(response.json(), indent=2, ensure_ascii=False)
-
+      # レスポンスがJSON形式で返却されるので、JSONをパースする
+      if(response.text == ''):
+        ret.append(response)
+      else:
+        ret.append(response.json())
+    return ret
 
 def makeUpdateData(csvFilePath,kintoneAppConfigData):
     import csv
