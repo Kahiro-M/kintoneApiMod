@@ -58,6 +58,10 @@ def readAppConfig(filePath,appId):
   else:
     return {'type':'error','hasOptions':config.options(str(appId))}
 
+# iniファイルの設定項目が必要な項目のテンプレートを返す
+def getTemplateConfig():
+  return {'domain': 'サブドメイン', 'appId': 'アプリ番号', 'token': 'トークン', 'action': 'Update/Insert/Delete', 'upkey': '更新用キー'}
+
 # kintoneのレコード更新用JSONを生成する
 def makeUpdateRecordsJson(kintoneConfigData,updateKeyValues,recordsKeyFields,recordsKeyValues):
   import json
@@ -66,7 +70,7 @@ def makeUpdateRecordsJson(kintoneConfigData,updateKeyValues,recordsKeyFields,rec
   # 更新用キーの数と更新データの件数が一致
   # かつ iniファイルの設定項目が必要な項目だけあれば更新用のデータを作成する。
   if(len(updateKeyValues) == len(recordsKeyValues)
-     and kintoneConfigData.keys() == templateConfig.keys()
+     and kintoneConfigData.keys() == getTemplateConfig().keys()
     ):
     appId          = kintoneConfigData['appId']
     updateKeyField = kintoneConfigData['upkey']
