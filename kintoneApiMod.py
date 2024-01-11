@@ -71,29 +71,37 @@ def makeUpdateRecordsJson(kintoneConfigData,updateKeyValues,recordsKeyFields,rec
     appId          = kintoneConfigData['appId']
     updateKeyField = kintoneConfigData['upkey']
 
+    # JSONにする文字列を配列に格納
+    jsonStrList = []
+
     # app,recordsの設定
-    jsonStr = '{'
-    jsonStr = jsonStr+'"app":'+str(appId)+','
-    jsonStr = jsonStr+'"records": ['
+    jsonStrList.append('{')
+    jsonStrList.append('"app":'+str(appId)+',')
+    jsonStrList.append('"records": [')
     # updatekeyの設定
     for updateKeyValue,recordsKeyValue in zip(updateKeyValues,recordsKeyValues):
-      # recordValueLabel = ['value']*len(recordsKeyFields)
-      jsonStr = jsonStr+'{'
-      jsonStr = jsonStr+'"updateKey": {'
-      jsonStr = jsonStr+'"field": "'+str(updateKeyField)+'",'
-      jsonStr = jsonStr+'"value": "'+str(updateKeyValue)+'"'
-      jsonStr = jsonStr+'},'
+      jsonStrList.append('{')
+      jsonStrList.append('"updateKey": {')
+      jsonStrList.append('"field": "'+str(updateKeyField)+'",')
+      jsonStrList.append('"value": "'+str(updateKeyValue)+'"')
+      jsonStrList.append('},')
     # recordの設定
-      jsonStr = jsonStr+'"record": {'
+      jsonStrList.append('"record": {')
       for field,value in zip(recordsKeyFields,recordsKeyValue):
-        jsonStr = jsonStr+'"'+str(field)+'":{"value":"'+str(value)+'"},'
+        jsonStrList.append('"'+str(field)+'":{"value":"'+str(value)+'"},')
       # recordの最終行のカンマは不要なので、スライスで削除する
-      jsonStr = jsonStr[:-1]+'}'
-      jsonStr = jsonStr+'},'
+      jsonStrList[-1] = jsonStrList[-1][:-1]
+      jsonStrList.append('}')
+      jsonStrList.append('},')
     # recordsの最終行のカンマは不要なので、スライスで削除する
-    jsonStr = jsonStr[:-1]+']'
-    jsonStr = jsonStr+'}'
+    jsonStrList[-1] = jsonStrList[-1][:-1]
+    jsonStrList.append(']')
+    jsonStrList.append('}')
 
+    # 配列に格納されたJSONにする文字列を結合
+    jsonStr = ''.join(jsonStrList)
+
+    # 文字列からJSONを作成
     jsonData = json.loads(jsonStr)
 
     return jsonData
