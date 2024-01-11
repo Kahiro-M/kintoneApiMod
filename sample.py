@@ -8,7 +8,7 @@ kintoneAppConfigData = ktmod.readAppConfig('kintone.ini','9999')
 updateKeyValues,recordsKeyFields,recordsKeyValues = ktmod.makeUpdateData('import_sjis.csv',kintoneAppConfigData)
 
 # 整形済みのレコードデータからUPDATE用のJSONを作成
-data = ktmod.makeUpdateRecordsJson(kintoneAppConfigData,updateKeyValues,recordsKeyFields,recordsKeyValues)
+data = ktmod.makeUpdateRecordsJsonList(kintoneAppConfigData,updateKeyValues,recordsKeyFields,recordsKeyValues,100)
 
 # JSONを元にUPDATE実行
 ret = ktmod.updateRecords(kintoneAppConfigData,data)
