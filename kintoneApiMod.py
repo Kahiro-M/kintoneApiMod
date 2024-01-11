@@ -141,7 +141,7 @@ def makeUpdateData(csvFilePath,kintoneAppConfigData):
     import csv
     import copy
 
-    with open('import_sjis.csv') as f:
+    with open(csvFilePath) as f:
         reader = csv.DictReader(f)
         importDict = [row for row in reader]
 
