@@ -5,8 +5,10 @@ TOKEN=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 ACTION=Update
 UPDATE_KEY=更新用キーのフィールドコード
 
+;更新 : ACTION=Update or Upsert
+;登録 : ACTION=Insert or Upsert
 ;セクション名にアプリIDを設定する
 [9999]
 TOKEN=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-ACTION=Update
+ACTION=Upsert
 UPDATE_KEY=更新用キーのフィールドコード
